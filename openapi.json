@@ -1,0 +1,2170 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Control Inventario API",
+    "version": "1.0.0",
+    "description": ""
+  },
+  "paths": {
+    "/api/tienda/listar/": {
+      "get": {
+        "operationId": "tienda_api_listar_tiendas",
+        "summary": "Listar Tiendas",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TiendaSchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "Lista todas las tiendas disponibles.",
+        "tags": [
+          "Tiendas"
+        ],
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/tienda/crear/": {
+      "post": {
+        "operationId": "tienda_api_crear_tienda",
+        "summary": "Crear Tienda",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TiendaSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Crea una nueva tienda.",
+        "tags": [
+          "Tiendas"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TiendaInSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/tienda/actualizar/{tienda_id}/": {
+      "patch": {
+        "operationId": "tienda_api_actualizar_tienda",
+        "summary": "Actualizar Tienda",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tienda_id",
+            "schema": {
+              "title": "Tienda Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TiendaSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Actualiza una tienda existente.",
+        "tags": [
+          "Tiendas"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TiendaInSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/tienda/eliminar/{tienda_id}/": {
+      "delete": {
+        "operationId": "tienda_api_eliminar_tienda",
+        "summary": "Eliminar Tienda",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tienda_id",
+            "schema": {
+              "title": "Tienda Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Elimina una tienda existente.",
+        "tags": [
+          "Tiendas"
+        ],
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/compra/rango/{proveedor_id}/": {
+      "get": {
+        "operationId": "compra_api_compras_por_rango",
+        "summary": "Compras Por Rango",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proveedor_id",
+            "schema": {
+              "title": "Proveedor Id",
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "fecha_inicio",
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Fecha Inicio"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "fecha_fin",
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Fecha Fin"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 3,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "schema": {
+              "default": "asc",
+              "title": "Order",
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CompraWithDetailsSchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Devuelve hasta `limit` compras con detalles.\n\n- Si no se pasa `fecha_inicio` ni `fecha_fin`, devuelve las últimas `limit` compras.\n- Si se pasa un rango (`fecha_inicio` y `fecha_fin`), devuelve las últimas `limit` compras dentro de ese rango.\n- Parámetro `order`: `asc` para ascendente (fecha antigua-\u003Enueva), `desc` para descendente (por defecto).",
+        "tags": [
+          "Compras"
+        ],
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/compra/crear/": {
+      "post": {
+        "operationId": "compra_api_crear_compra",
+        "summary": "Crear Compra",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompraWithDetailsSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Crea una nueva compra y genera un detalle por cada producto del proveedor con valores en 0.",
+        "tags": [
+          "Compras"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompraInSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/compra/detalle/crear/{compra_id}/": {
+      "post": {
+        "operationId": "compra_api_crear_detalle",
+        "summary": "Crear Detalle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "compra_id",
+            "schema": {
+              "title": "Compra Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetalleCompraSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Crea un nuevo detalle de compra para una compra existente.",
+        "tags": [
+          "Compras"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DetalleCompraInSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/compra/detalle/editar/{detalle_id}/": {
+      "patch": {
+        "operationId": "compra_api_editar_detalle",
+        "summary": "Editar Detalle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "detalle_id",
+            "schema": {
+              "title": "Detalle Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetalleCompraSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Edita un detalle de compra existente.",
+        "tags": [
+          "Compras"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DetalleCompraUpdateSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/compra/compra/{compra}/": {
+      "patch": {
+        "operationId": "compra_api_actualizar_compra",
+        "summary": "Actualizar Compra",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "compra",
+            "schema": {
+              "title": "Compra",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompraSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Actualiza una compra existente.",
+        "tags": [
+          "Compras"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompraUpdateSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/compra/detalle/eliminar/{detalle_id}/": {
+      "delete": {
+        "operationId": "compra_api_eliminar_detalle",
+        "summary": "Eliminar Detalle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "detalle_id",
+            "schema": {
+              "title": "Detalle Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Elimina un detalle de compra existente.",
+        "tags": [
+          "Compras"
+        ],
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/compra/eliminar/{compra_id}/": {
+      "delete": {
+        "operationId": "compra_api_eliminar_compra",
+        "summary": "Eliminar Compra",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "compra_id",
+            "schema": {
+              "title": "Compra Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Elimina una compra (y sus detalles por cascade).",
+        "tags": [
+          "Compras"
+        ],
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/proveedor/listar/{tienda_id}/": {
+      "get": {
+        "operationId": "proveedor_api_listar_proveedores",
+        "summary": "Listar Proveedores",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tienda_id",
+            "schema": {
+              "title": "Tienda Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProveedorSchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "Lista todos los proveedores de una tienda específica.",
+        "tags": [
+          "Proveedores"
+        ],
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/proveedor/crear/": {
+      "post": {
+        "operationId": "proveedor_api_crear_proveedor",
+        "summary": "Crear Proveedor",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProveedorSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Crea un nuevo proveedor asociado a una tienda.",
+        "tags": [
+          "Proveedores"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProveedorInSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/proveedor/actualizar/{proveedor_id}/": {
+      "patch": {
+        "operationId": "proveedor_api_actualizar_proveedor",
+        "summary": "Actualizar Proveedor",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proveedor_id",
+            "schema": {
+              "title": "Proveedor Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProveedorSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Actualiza un proveedor existente.",
+        "tags": [
+          "Proveedores"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProveedorUpdateSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/proveedor/eliminar/{proveedor_id}/": {
+      "delete": {
+        "operationId": "proveedor_api_eliminar_proveedor",
+        "summary": "Eliminar Proveedor",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proveedor_id",
+            "schema": {
+              "title": "Proveedor Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Elimina un proveedor existente.",
+        "tags": [
+          "Proveedores"
+        ],
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/producto/listar/{proveedor_id}/": {
+      "get": {
+        "operationId": "producto_api_listar_productos",
+        "summary": "Listar Productos",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proveedor_id",
+            "schema": {
+              "title": "Proveedor Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProductoSchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "Lista todos los productos de un proveedor específico.",
+        "tags": [
+          "Productos"
+        ],
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/producto/crear/": {
+      "post": {
+        "operationId": "producto_api_crear_producto",
+        "summary": "Crear Producto",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductoSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Crea un nuevo producto asociado a un proveedor.",
+        "tags": [
+          "Productos"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductoInSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/producto/actualizar/{producto_id}/": {
+      "patch": {
+        "operationId": "producto_api_actualizar_producto",
+        "summary": "Actualizar Producto",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "producto_id",
+            "schema": {
+              "title": "Producto Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductoSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Actualiza un producto existente.",
+        "tags": [
+          "Productos"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductoUpdateSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/producto/eliminar/{producto_id}/": {
+      "delete": {
+        "operationId": "producto_api_eliminar_producto",
+        "summary": "Eliminar Producto",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "producto_id",
+            "schema": {
+              "title": "Producto Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Elimina un producto existente.",
+        "tags": [
+          "Productos"
+        ],
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/usuario/login/": {
+      "post": {
+        "operationId": "usuario_apis_usuarios_y_login_login",
+        "summary": "Login",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Usuarios y Login"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginSchema"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/usuario/crear/": {
+      "post": {
+        "operationId": "usuario_apis_usuarios_y_login_crear_usuario",
+        "summary": "Crear Usuario",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOutSchema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Usuarios y Login"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreateSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/usuario/password/change/": {
+      "put": {
+        "operationId": "usuario_apis_usuarios_y_login_change_password",
+        "summary": "Change Password",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Usuarios y Login"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/usuario/password/reset/{usuario_id}/": {
+      "post": {
+        "operationId": "usuario_apis_usuarios_y_login_super_reset_password",
+        "summary": "Super Reset Password",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "usuario_id",
+            "schema": {
+              "title": "Usuario Id",
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Usuarios y Login"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuperUserResetPasswordSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/usuario/logout/": {
+      "post": {
+        "operationId": "usuario_apis_usuarios_y_login_logout",
+        "summary": "Logout",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Usuarios y Login"
+        ],
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/usuario/permisos/usuario/{usuario_id}/": {
+      "get": {
+        "operationId": "usuario_apis_permisos_listar_permisos",
+        "summary": "Listar Permisos",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "usuario_id",
+            "schema": {
+              "title": "Usuario Id",
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PermisosUsuarioTiendaSchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Permisos Usuario-Tienda"
+        ],
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/usuario/permisos/": {
+      "post": {
+        "operationId": "usuario_apis_permisos_crear_permiso",
+        "summary": "Crear Permiso",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermisosUsuarioTiendaSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Permisos Usuario-Tienda"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermisosUsuarioTiendaInSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    },
+    "/api/usuario/permisos/{permiso_id}/": {
+      "put": {
+        "operationId": "usuario_apis_permisos_actualizar_permiso",
+        "summary": "Actualizar Permiso",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "permiso_id",
+            "schema": {
+              "title": "Permiso Id",
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermisosUsuarioTiendaSchema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Permisos Usuario-Tienda"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermisosUsuarioTiendaUpdateSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "usuario_apis_permisos_eliminar_permiso",
+        "summary": "Eliminar Permiso",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "permiso_id",
+            "schema": {
+              "title": "Permiso Id",
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Permisos Usuario-Tienda"
+        ],
+        "security": [
+          {
+            "AuthBearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TiendaSchema": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "ID"
+          },
+          "nombre": {
+            "maxLength": 100,
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre"
+        ],
+        "title": "TiendaSchema",
+        "type": "object"
+      },
+      "ErrorSchema": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "ErrorSchema",
+        "type": "object"
+      },
+      "TiendaInSchema": {
+        "properties": {
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre"
+        ],
+        "title": "TiendaInSchema",
+        "type": "object"
+      },
+      "CompraWithDetailsSchema": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "ID"
+          },
+          "proveedor": {
+            "title": "Proveedor",
+            "type": "integer"
+          },
+          "fecha_compra": {
+            "format": "date",
+            "title": "Fecha Compra",
+            "type": "string"
+          },
+          "detalles": {
+            "items": {
+              "$ref": "#/components/schemas/DetalleCompraSchema"
+            },
+            "title": "Detalles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "proveedor",
+          "detalles"
+        ],
+        "title": "CompraWithDetailsSchema",
+        "type": "object"
+      },
+      "DetalleCompraSchema": {
+        "properties": {
+          "producto_nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Producto Nombre"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "ID"
+          },
+          "compra": {
+            "title": "Compra",
+            "type": "integer"
+          },
+          "producto": {
+            "title": "Producto",
+            "type": "integer"
+          },
+          "cantidad": {
+            "title": "Cantidad",
+            "type": "integer"
+          },
+          "inventario_anterior": {
+            "title": "Inventario Anterior",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "compra",
+          "producto",
+          "cantidad",
+          "inventario_anterior"
+        ],
+        "title": "DetalleCompraSchema",
+        "type": "object"
+      },
+      "CompraInSchema": {
+        "properties": {
+          "proveedor_id": {
+            "title": "Proveedor Id",
+            "type": "integer"
+          },
+          "fecha_compra": {
+            "format": "date",
+            "title": "Fecha Compra",
+            "type": "string"
+          }
+        },
+        "required": [
+          "proveedor_id",
+          "fecha_compra"
+        ],
+        "title": "CompraInSchema",
+        "type": "object"
+      },
+      "DetalleCompraInSchema": {
+        "properties": {
+          "compra_id": {
+            "title": "Compra Id",
+            "type": "integer"
+          },
+          "producto_id": {
+            "title": "Producto Id",
+            "type": "integer"
+          },
+          "cantidad": {
+            "title": "Cantidad",
+            "type": "integer"
+          },
+          "inventario_anterior": {
+            "title": "Inventario Anterior",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "compra_id",
+          "producto_id",
+          "cantidad",
+          "inventario_anterior"
+        ],
+        "title": "DetalleCompraInSchema",
+        "type": "object"
+      },
+      "DetalleCompraUpdateSchema": {
+        "properties": {
+          "cantidad": {
+            "title": "Cantidad",
+            "type": "integer"
+          },
+          "inventario_anterior": {
+            "title": "Inventario Anterior",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "cantidad",
+          "inventario_anterior"
+        ],
+        "title": "DetalleCompraUpdateSchema",
+        "type": "object"
+      },
+      "CompraSchema": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "ID"
+          },
+          "proveedor": {
+            "title": "Proveedor",
+            "type": "integer"
+          },
+          "fecha_compra": {
+            "format": "date",
+            "title": "Fecha Compra",
+            "type": "string"
+          }
+        },
+        "required": [
+          "proveedor"
+        ],
+        "title": "CompraSchema",
+        "type": "object"
+      },
+      "CompraUpdateSchema": {
+        "properties": {
+          "fecha_compra": {
+            "format": "date",
+            "title": "Fecha Compra",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fecha_compra"
+        ],
+        "title": "CompraUpdateSchema",
+        "type": "object"
+      },
+      "ProveedorSchema": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "ID"
+          },
+          "nombre": {
+            "maxLength": 100,
+            "title": "Nombre",
+            "type": "string"
+          },
+          "tienda": {
+            "title": "Tienda",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "nombre",
+          "tienda"
+        ],
+        "title": "ProveedorSchema",
+        "type": "object"
+      },
+      "ProveedorInSchema": {
+        "properties": {
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "tienda_id": {
+            "title": "Tienda Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "nombre",
+          "tienda_id"
+        ],
+        "title": "ProveedorInSchema",
+        "type": "object"
+      },
+      "ProveedorUpdateSchema": {
+        "properties": {
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre"
+        ],
+        "title": "ProveedorUpdateSchema",
+        "type": "object"
+      },
+      "ProductoSchema": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "ID"
+          },
+          "nombre": {
+            "maxLength": 100,
+            "title": "Nombre",
+            "type": "string"
+          },
+          "proveedor": {
+            "title": "Proveedor",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "nombre",
+          "proveedor"
+        ],
+        "title": "ProductoSchema",
+        "type": "object"
+      },
+      "ProductoInSchema": {
+        "properties": {
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "proveedor_id": {
+            "title": "Proveedor Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "nombre",
+          "proveedor_id"
+        ],
+        "title": "ProductoInSchema",
+        "type": "object"
+      },
+      "ProductoUpdateSchema": {
+        "properties": {
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre"
+        ],
+        "title": "ProductoUpdateSchema",
+        "type": "object"
+      },
+      "TokenSchema": {
+        "properties": {
+          "token": {
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "TokenSchema",
+        "type": "object"
+      },
+      "LoginSchema": {
+        "properties": {
+          "username": {
+            "title": "Username",
+            "type": "string"
+          },
+          "password": {
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "LoginSchema",
+        "type": "object"
+      },
+      "PermisosUsuarioTiendaSchema": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "ID"
+          },
+          "usuario": {
+            "title": "Usuario",
+            "type": "integer"
+          },
+          "tienda": {
+            "title": "Tienda",
+            "type": "integer"
+          },
+          "puede_gestionar_proveedores": {
+            "default": true,
+            "title": "Puede Gestionar Proveedores",
+            "type": "boolean"
+          },
+          "puede_gestionar_productos": {
+            "default": true,
+            "title": "Puede Gestionar Productos",
+            "type": "boolean"
+          },
+          "puede_gestionar_compras": {
+            "default": true,
+            "title": "Puede Gestionar Compras",
+            "type": "boolean"
+          },
+          "puede_editar_compras": {
+            "default": true,
+            "title": "Puede Editar Compras",
+            "type": "boolean"
+          },
+          "puede_ver_inventario_compras": {
+            "default": true,
+            "title": "Puede Ver Inventario Compras",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "usuario",
+          "tienda"
+        ],
+        "title": "PermisosUsuarioTiendaSchema",
+        "type": "object"
+      },
+      "UserOutSchema": {
+        "properties": {
+          "permisos": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/PermisosUsuarioTiendaSchema"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Permisos"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "ID"
+          },
+          "username": {
+            "maxLength": 150,
+            "title": "Username",
+            "type": "string"
+          },
+          "es_superusuario": {
+            "default": false,
+            "title": "Es Superusuario",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "username"
+        ],
+        "title": "UserOutSchema",
+        "type": "object"
+      },
+      "UserCreateSchema": {
+        "properties": {
+          "username": {
+            "title": "Username",
+            "type": "string"
+          },
+          "password": {
+            "title": "Password",
+            "type": "string"
+          },
+          "es_superusuario": {
+            "default": false,
+            "title": "Es Superusuario",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "UserCreateSchema",
+        "type": "object"
+      },
+      "ChangePasswordSchema": {
+        "properties": {
+          "old_password": {
+            "title": "Old Password",
+            "type": "string"
+          },
+          "new_password": {
+            "title": "New Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "old_password",
+          "new_password"
+        ],
+        "title": "ChangePasswordSchema",
+        "type": "object"
+      },
+      "SuperUserResetPasswordSchema": {
+        "properties": {
+          "new_password": {
+            "title": "New Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "new_password"
+        ],
+        "title": "SuperUserResetPasswordSchema",
+        "type": "object"
+      },
+      "PermisosUsuarioTiendaInSchema": {
+        "properties": {
+          "tienda_id": {
+            "title": "Tienda Id",
+            "type": "integer"
+          },
+          "puede_gestionar_proveedores": {
+            "default": true,
+            "title": "Puede Gestionar Proveedores",
+            "type": "boolean"
+          },
+          "puede_gestionar_productos": {
+            "default": true,
+            "title": "Puede Gestionar Productos",
+            "type": "boolean"
+          },
+          "puede_gestionar_compras": {
+            "default": true,
+            "title": "Puede Gestionar Compras",
+            "type": "boolean"
+          },
+          "puede_editar_compras": {
+            "default": true,
+            "title": "Puede Editar Compras",
+            "type": "boolean"
+          },
+          "puede_ver_inventario_compras": {
+            "default": true,
+            "title": "Puede Ver Inventario Compras",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "tienda_id"
+        ],
+        "title": "PermisosUsuarioTiendaInSchema",
+        "type": "object"
+      },
+      "PermisosUsuarioTiendaUpdateSchema": {
+        "properties": {
+          "puede_gestionar_proveedores": {
+            "title": "Puede Gestionar Proveedores",
+            "type": "boolean"
+          },
+          "puede_gestionar_productos": {
+            "title": "Puede Gestionar Productos",
+            "type": "boolean"
+          },
+          "puede_gestionar_compras": {
+            "title": "Puede Gestionar Compras",
+            "type": "boolean"
+          },
+          "puede_editar_compras": {
+            "title": "Puede Editar Compras",
+            "type": "boolean"
+          },
+          "puede_ver_inventario_compras": {
+            "title": "Puede Ver Inventario Compras",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "puede_gestionar_proveedores",
+          "puede_gestionar_productos",
+          "puede_gestionar_compras",
+          "puede_editar_compras",
+          "puede_ver_inventario_compras"
+        ],
+        "title": "PermisosUsuarioTiendaUpdateSchema",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "AuthBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "servers": []
+}
