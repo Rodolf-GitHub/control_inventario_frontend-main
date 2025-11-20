@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth';
 import useSWR from 'swr';
-import { Plus, Trash2, ShoppingCart, Calendar, Edit2, Pencil, Package, Check, X, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, ShoppingCart, Calendar, Edit2, Pencil, Package, Check, X, RefreshCw, Download } from 'lucide-react';
 import { Nav } from '@/components/layout/nav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -351,6 +351,64 @@ export default function ComprasPage() {
     }
   };
 
+  const exportComprasPdf = () => {
+    try {
+      const wrapper = document.getElementById('compras-table-wrapper');
+      if (!wrapper) {
+        toastError({ title: 'Error', description: 'No se encontró la tabla a exportar' });
+        return;
+      }
+      const clone = wrapper.cloneNode(true) as HTMLElement;
+
+      // Inline computed styles from original into the clone so colors are preserved
+      const origNodes = wrapper.querySelectorAll('*');
+      const cloneNodes = clone.querySelectorAll('*');
+      for (let i = 0; i < origNodes.length; i++) {
+        const o = origNodes[i] as HTMLElement;
+        const c = cloneNodes[i] as HTMLElement | undefined;
+        if (!c || !o) continue;
+        try {
+          const cs = window.getComputedStyle(o);
+          if (cs.backgroundColor) c.style.backgroundColor = cs.backgroundColor;
+          if (cs.color) c.style.color = cs.color;
+          if (cs.fontWeight) c.style.fontWeight = cs.fontWeight;
+          if (cs.border) c.style.border = cs.border;
+          if (cs.padding) c.style.padding = cs.padding;
+          if (cs.textAlign) c.style.textAlign = cs.textAlign;
+        } catch (err) {
+          // ignore
+        }
+      }
+
+      // Remove suggestion spans and inventory columns and any buttons from the clone
+      clone.querySelectorAll('.no-print-suggestion').forEach((el) => el.remove());
+      clone.querySelectorAll('.inv-col').forEach((el) => el.remove());
+      clone.querySelectorAll('button').forEach((el) => el.remove());
+
+      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Inventario Compras</title><style>body{font-family:Inter,system-ui,Arial,Helvetica,sans-serif;margin:20px;-webkit-print-color-adjust:exact;print-color-adjust:exact}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:6px;text-align:center;font-size:12px}th{background:#f3f4f6;font-weight:600}</style></head><body>${clone.innerHTML}</body></html>`;
+
+      const w = window.open('', '_blank');
+      if (!w) {
+        toastError({ title: 'Error', description: 'No se pudo abrir la ventana para imprimir' });
+        return;
+      }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      setTimeout(() => {
+        try {
+          w.focus();
+          w.print();
+        } catch (err) {
+          console.error('print error', err);
+        }
+      }, 500);
+    } catch (error) {
+      console.error('exportComprasPdf error', error);
+      toastError({ title: 'Error', description: 'Falló la exportación a PDF' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Nav />
@@ -361,7 +419,7 @@ export default function ComprasPage() {
             <span className="hidden sm:inline">Inventario de Compras</span>
             <span className="sm:hidden">Inventario</span>
           </h1>
-          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
             <Dialog open={openCreateDialog} onOpenChange={setOpenCreateDialog}>
               <DialogTrigger asChild>
                 <Button size="icon" className="h-8 w-8 sm:h-9 sm:w-9" title="Nueva Compra">
@@ -434,6 +492,15 @@ export default function ComprasPage() {
               disabled={isLoading}
             >
               <RefreshCw className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 sm:h-9 sm:w-9"
+              title="Exportar tabla a PDF"
+              onClick={() => exportComprasPdf()}
+            >
+              <Download className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -527,12 +594,12 @@ export default function ComprasPage() {
           <>
             {/* toolbar removed per UX request (icons were duplicated) */}
 
-            <div className="rounded-lg border bg-card overflow-x-auto shadow-sm mx-0 sm:mx-2">
+            <div id="compras-table-wrapper" className="rounded-lg border bg-card overflow-x-auto shadow-sm mx-0 sm:mx-2">
             <Table>
               <TableHeader>
                 <TableRow>
                   {canViewInventory && colsCompras.map((c, idx) => (
-                    <TableHead key={`inv-${c.id}`} className="bg-blue-100 dark:bg-blue-950/50 text-blue-800 dark:text-blue-200 w-[50px] sm:w-16 text-center text-[10px] sm:text-xs p-0.5 sm:p-1">
+                    <TableHead key={`inv-${c.id}`} className="inv-col bg-blue-100 dark:bg-blue-950/50 text-blue-800 dark:text-blue-200 w-[50px] sm:w-16 text-center text-[10px] sm:text-xs p-0.5 sm:p-1">
                       {formatDate(c.fecha_compra)}
                     </TableHead>
                   ))}
@@ -559,7 +626,7 @@ export default function ComprasPage() {
                       const field = `col${idx + 1}Inv`;
                       const editingField = editingCell?.field === field && editingCell?.id === item.id;
                       return (
-                        <TableCell key={`invcell-${item.id}-${idx}`} className="bg-blue-50/50 dark:bg-blue-950/20 text-center p-0.5 sm:p-1">
+                        <TableCell key={`invcell-${item.id}-${idx}`} className="inv-col bg-blue-50/50 dark:bg-blue-950/20 text-center p-0.5 sm:p-1">
                                 {editingField ? (
                                   <Input
                                     type="number"
@@ -623,7 +690,7 @@ export default function ComprasPage() {
                                   autoFocus
                                 />
                                 {showSuggestion ? (
-                                  <span className="text-[8px] text-green-600 dark:text-green-400">{suggestion}</span>
+                                  <span className="no-print-suggestion text-[8px] text-green-600 dark:text-green-400">{suggestion}</span>
                                 ) : (
                                   <span className="text-[7px] sm:text-[8px] text-muted-foreground">&nbsp;</span>
                                 )}
@@ -637,7 +704,7 @@ export default function ComprasPage() {
                                   {compraDisplay}
                                 </span>
                                 {showSuggestion ? (
-                                  <span className="text-[8px] text-green-600 dark:text-green-400">{suggestion}</span>
+                                  <span className="no-print-suggestion text-[8px] text-green-600 dark:text-green-400">{suggestion}</span>
                                 ) : (
                                   <span className="text-[7px] sm:text-[8px] text-muted-foreground">&nbsp;</span>
                                 )}

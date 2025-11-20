@@ -2,8 +2,10 @@ import withPWA from '@ducanh2912/next-pwa';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Use static export only for production builds when explicitly desired.
-  output: process.env.NODE_ENV === 'production' ? 'export' : undefined,
+  // Use static export only when explicitly requested via NEXT_EXPORT=1.
+  // This avoids forcing `output: 'export'` on every production build
+  // which breaks pages that are intentionally dynamic (auth, client-side).
+  output: process.env.NEXT_EXPORT === '1' ? 'export' : undefined,
   typescript: {
     ignoreBuildErrors: true,
   },

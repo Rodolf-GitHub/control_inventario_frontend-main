@@ -9,6 +9,7 @@ import { loginApi } from '@/lib/api/usuarios';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth';
 import { Toaster } from '@/components/ui/toaster';
+import { Store } from 'lucide-react';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -37,15 +38,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <Card className="w-full max-w-md">
-        <CardContent>
-          <h2 className="text-lg font-semibold mb-4">Iniciar sesión</h2>
-          <form onSubmit={handleSubmit} className="space-y-3">
+        <CardContent className="flex flex-col items-center gap-4 py-8">
+          <div className="flex flex-col items-center gap-2">
+            <div className="rounded-full bg-blue-50 p-3">
+              <Store className="h-10 w-10 text-blue-600" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-center">Iniciar sesión</h2>
+            <p className="text-sm text-muted-foreground text-center">Accede con tu usuario y contraseña</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="w-full space-y-3 mt-2">
             <Input placeholder="Usuario" value={username} onChange={(e) => setUsername(e.target.value)} />
             <Input placeholder="Contraseña" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <div className="flex justify-end">
-              <Button type="submit" disabled={loading}>{loading ? 'Ingresando...' : 'Ingresar'}</Button>
+            <div className="flex justify-center">
+              <Button type="submit" className="w-full max-w-xs" disabled={loading}>{loading ? 'Ingresando...' : 'Ingresar'}</Button>
             </div>
           </form>
         </CardContent>

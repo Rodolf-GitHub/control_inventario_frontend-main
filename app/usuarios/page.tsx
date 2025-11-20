@@ -202,7 +202,7 @@ export default function UsuariosPage() {
                                   <Key className="h-4 w-4 text-sky-600" />
                                 </Button>
 
-                                <Button size="icon" variant="ghost" onClick={() => router.push(`/usuarios/gestionar/${u.id}`)} title={`Gestionar permisos de ${u.username}`}>
+                                <Button size="icon" variant="ghost" onClick={() => router.push(`/usuarios/gestionar?id=${u.id}`)} title={`Gestionar permisos de ${u.username}`}>
                                   <Settings className="h-4 w-4 text-emerald-600" />
                                 </Button>
 
@@ -233,7 +233,7 @@ export default function UsuariosPage() {
                           }} title={`Resetear contraseña de ${u.username}`}>
                             <Key className="h-4 w-4 text-sky-600" />
                           </Button>
-                          <Button size="icon" variant="ghost" onClick={() => router.push(`/usuarios/gestionar/${u.id}`)} title={`Gestionar permisos de ${u.username}`}>
+                          <Button size="icon" variant="ghost" onClick={() => router.push(`/usuarios/gestionar?id=${u.id}`)} title={`Gestionar permisos de ${u.username}`}>
                             <Settings className="h-4 w-4 text-emerald-600" />
                           </Button>
                           <Button size="icon" variant="destructive" onClick={() => handleDeleteUser(u.id)} title={`Eliminar usuario ${u.username}`}>
