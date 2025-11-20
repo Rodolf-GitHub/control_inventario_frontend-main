@@ -215,7 +215,9 @@ export default function ComprasPage() {
 
         item[`col${idx}Compra`] = cantidad;
         item[`col${idx}Anterior`] = anteriorNum;
-        item[`col${idx}Inv`] = anteriorNum !== null ? anteriorNum + cantidad : null;
+        // Mostrar exactamente lo que trae el backend en `inventario_anterior`.
+        // No realizar cálculos locales (antes se sumaba `anterior + cantidad`).
+        item[`col${idx}Inv`] = anteriorNum;
         item[`col${idx}DetalleId`] = detalle.id;
       });
     });
@@ -299,23 +301,23 @@ export default function ComprasPage() {
       const item = updated.find((i) => i.id === itemId);
       const detalleId = item?.[`col${colIdx}DetalleId`];
       const currentCompra = item?.[`col${colIdx}Compra`] || 0;
-      // When editing the inventory cell we treat the input as the new inventory (inv = anterior + compra)
-      // so inventario_anterior = newInv - compra
+      // When editing the inventory cell we will send the absolute value
+      // the user entered for the inventory cell (no diffs).
       const newInv = newValue;
-      const newInventarioAnterior = newInv - currentCompra;
+      const newInventarioAnterior = newInv; // send absolute value, not difference
       if (detalleId) {
         // Debug log: detalle info for inv edit
         // eslint-disable-next-line no-console
         console.log('[handleCellSave] inv edit - detalleId found', { detalleId, currentCompra, newInv, newInventarioAnterior });
         try {
-          // Send only the edited column (inventario_anterior). Backend should treat this as a PATCH.
+          // Send only the edited column (inventario_anterior) as the absolute value.
           const payload = { inventario_anterior: newInventarioAnterior };
           // eslint-disable-next-line no-console
           console.log('[handleCellSave] sending editarDetalle (inv)', { detalleId, payload });
           const editarRespInv = await editarDetalle(detalleId, payload);
           // eslint-disable-next-line no-console
           console.log('[handleCellSave] editarDetalle response (inv)', { detalleId, editarRespInv });
-          // Update state fields for anterior and inv
+          // Update state fields for anterior and inv to reflect the entered absolute value
           const anteriorField = `col${colIdx}Anterior`;
           const invField = `col${colIdx}Inv`;
           const newUpdated = updated.map((it) => it.id === itemId ? { ...it, [anteriorField]: newInventarioAnterior, [invField]: newInv } : it);
