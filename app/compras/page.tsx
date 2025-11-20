@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/lib/auth';
 import useSWR from 'swr';
 import { Plus, Trash2, ShoppingCart, Calendar, Edit2, Pencil, Package, Check, X, RefreshCw, Download } from 'lucide-react';
@@ -57,7 +57,7 @@ export default function ComprasPage() {
     // Only fetch when proveedor is selected; otherwise skip request
     shouldFetchCompras ? ['compras', selectedTienda, selectedProveedor, fechaInicio, fechaFin, safeLimit] : null,
     () => comprasPorRango(fechaInicio || undefined, fechaFin || undefined, safeLimit, selectedTienda ?? undefined, selectedProveedor ?? undefined),
-    { refreshInterval: 5000 }
+    { refreshInterval: 0 }
   );
 
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
@@ -71,6 +71,7 @@ export default function ComprasPage() {
   const [inventarioAnterior, setInventarioAnterior] = useState('');
   const { toast } = useToast();
   const [inventario, setInventario] = useState<any[]>([]);
+  const skipRebuildRef = useRef(false);
   const { user } = useAuth();
   const canViewInventory = !!(user?.es_superusuario || (user?.permisos || []).some((p: any) => p?.puede_ver_inventario_compras));
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
@@ -219,6 +220,12 @@ export default function ComprasPage() {
       });
     });
 
+    // If this rebuild was triggered by a local optimistic update, skip it once
+    if (skipRebuildRef.current) {
+      skipRebuildRef.current = false;
+      return;
+    }
+
     setInventario(Array.from(map.values()));
   }, [compras]);
 
@@ -253,13 +260,30 @@ export default function ComprasPage() {
         console.log('[handleCellSave] compra edit - detalleId found', { detalleId, newValue });
         try {
           // Send only the edited column (cantidad). Backend should treat this as a PATCH.
-          await editarDetalle(detalleId, {
-            cantidad: newValue,
-          });
+          const payload = { cantidad: newValue };
+          // eslint-disable-next-line no-console
+          console.log('[handleCellSave] sending editarDetalle (compra)', { detalleId, payload });
+          const editarResp = await editarDetalle(detalleId, payload);
+          // eslint-disable-next-line no-console
+          console.log('[handleCellSave] editarDetalle response (compra)', { detalleId, editarResp });
           const t = toast({ title: 'Actualizado', description: 'Cantidad actualizada correctamente' });
           setTimeout(() => t.dismiss(), 500);
-          // inventory (anterior/inv) remains unchanged locally unless user edits that column
-          mutate();
+          // Optimistically update the compras cache so future reads use the edited cantidad
+          try {
+            if (typeof mutate === 'function' && compras) {
+              const newCompras = (compras || []).map((c: any) => ({
+                ...c,
+                detalles: Array.isArray(c.detalles) ? c.detalles.map((d: any) => d.id === detalleId ? { ...d, cantidad: newValue } : d) : c.detalles,
+              }));
+              // update cache without revalidation
+              // set flag to skip the subsequent rebuild of inventory from compras
+              skipRebuildRef.current = true;
+              // @ts-ignore
+              mutate(newCompras, false);
+            }
+          } catch (err) {
+            // ignore
+          }
         } catch (error) {
           // eslint-disable-next-line no-console
           console.error('[handleCellSave] editarDetalle error', error);
@@ -285,9 +309,12 @@ export default function ComprasPage() {
         console.log('[handleCellSave] inv edit - detalleId found', { detalleId, currentCompra, newInv, newInventarioAnterior });
         try {
           // Send only the edited column (inventario_anterior). Backend should treat this as a PATCH.
-          await editarDetalle(detalleId, {
-            inventario_anterior: newInventarioAnterior,
-          });
+          const payload = { inventario_anterior: newInventarioAnterior };
+          // eslint-disable-next-line no-console
+          console.log('[handleCellSave] sending editarDetalle (inv)', { detalleId, payload });
+          const editarRespInv = await editarDetalle(detalleId, payload);
+          // eslint-disable-next-line no-console
+          console.log('[handleCellSave] editarDetalle response (inv)', { detalleId, editarRespInv });
           // Update state fields for anterior and inv
           const anteriorField = `col${colIdx}Anterior`;
           const invField = `col${colIdx}Inv`;
@@ -295,7 +322,21 @@ export default function ComprasPage() {
           setInventario(newUpdated);
           const t = toast({ title: 'Actualizado', description: 'Detalle actualizado correctamente' });
           setTimeout(() => t.dismiss(), 500);
-          mutate();
+          try {
+            if (typeof mutate === 'function' && compras) {
+              const newCompras = (compras || []).map((c: any) => ({
+                ...c,
+                detalles: Array.isArray(c.detalles) ? c.detalles.map((d: any) => d.id === detalleId ? { ...d, inventario_anterior: newInventarioAnterior } : d) : c.detalles,
+              }));
+              // update cache without revalidation
+              // set flag to skip the subsequent rebuild of inventory from compras
+              skipRebuildRef.current = true;
+              // @ts-ignore
+              mutate(newCompras, false);
+            }
+          } catch (err) {
+            // ignore
+          }
         } catch (error) {
           // eslint-disable-next-line no-console
           console.error('[handleCellSave] editarDetalle error (inv)', error);
@@ -625,8 +666,14 @@ export default function ComprasPage() {
                     {canViewInventory && colsCompras.map((c, idx) => {
                       const field = `col${idx + 1}Inv`;
                       const editingField = editingCell?.field === field && editingCell?.id === item.id;
+                      const cellValue = item[field];
+                      const display = (cellValue === null || cellValue === undefined || cellValue === 0) ? '-' : String(cellValue);
                       return (
-                        <TableCell key={`invcell-${item.id}-${idx}`} className="inv-col bg-blue-50/50 dark:bg-blue-950/20 text-center p-0.5 sm:p-1">
+                        <TableCell
+                          key={`invcell-${item.id}-${idx}`}
+                          className={`inv-col bg-blue-50/50 dark:bg-blue-950/20 text-center p-0.5 sm:p-1 ${!editingField ? 'cursor-pointer' : ''}`}
+                          onClick={!editingField ? () => handleCellClick(item.id, field, cellValue ?? 0) : undefined}
+                        >
                                 {editingField ? (
                                   <Input
                                     type="number"
@@ -638,20 +685,13 @@ export default function ComprasPage() {
                                     autoFocus
                                   />
                                 ) : (
-                                  (() => {
-                                    const value = item[field];
-                                    const display = (value === null || value === undefined || value === 0) ? '-' : String(value);
-                                    return (
-                                      <div className="flex flex-col items-center gap-0">
-                                        <span
-                                          onClick={() => handleCellClick(item.id, field, value ?? 0)}
-                                          className="text-blue-700 dark:text-blue-300 font-semibold text-[10px] sm:text-sm cursor-pointer hover:bg-blue-100/50 dark:hover:bg-blue-900/30 px-0.5 py-0.5 rounded"
-                                        >
-                                          {display}
-                                        </span>
-                                      </div>
-                                    );
-                                  })()
+                                  <div className="flex flex-col items-center gap-0">
+                                    <span
+                                      className="text-blue-700 dark:text-blue-300 font-semibold text-[10px] sm:text-sm hover:bg-blue-100/50 dark:hover:bg-blue-900/30 px-0.5 py-0.5 rounded"
+                                    >
+                                      {display}
+                                    </span>
+                                  </div>
                                 )}
                         </TableCell>
                       );
@@ -676,7 +716,11 @@ export default function ComprasPage() {
                       const suggestion = showSuggestion ? (prevInv - currInv) : null;
 
                       return (
-                        <TableCell key={`compcell-${item.id}-${idx}`} className="bg-red-50/50 dark:bg-red-950/20 text-center p-0.5 sm:p-1">
+                        <TableCell
+                          key={`compcell-${item.id}-${idx}`}
+                          className={`bg-red-50/50 dark:bg-red-950/20 text-center p-0.5 sm:p-1 ${!editingField ? 'cursor-pointer' : ''}`}
+                          onClick={!editingField ? () => handleCellClick(item.id, compraField, item[compraField] || 0) : undefined}
+                        >
                           <div className="flex flex-col items-center gap-0">
                                 {editingField ? (
                               <>
@@ -698,8 +742,7 @@ export default function ComprasPage() {
                             ) : (
                               <>
                                 <span
-                                  onClick={() => handleCellClick(item.id, compraField, item[compraField] || 0)}
-                                  className="font-semibold text-red-700 dark:text-red-300 text-[10px] sm:text-sm cursor-pointer hover:bg-red-100/50 dark:hover:bg-red-900/30 px-0.5 py-0.5 rounded"
+                                  className="font-semibold text-red-700 dark:text-red-300 text-[10px] sm:text-sm hover:bg-red-100/50 dark:hover:bg-red-900/30 px-0.5 py-0.5 rounded"
                                 >
                                   {compraDisplay}
                                 </span>

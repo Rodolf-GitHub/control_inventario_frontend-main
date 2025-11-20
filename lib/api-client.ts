@@ -55,5 +55,16 @@ export async function apiRequest<T>(
     throw new Error(errorMessage);
   }
 
-  return response.json();
+  // Parse and log response (non-production) to help debug payloads
+  const data = await response.json();
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      // eslint-disable-next-line no-console
+      console.debug('[apiRequest] ', { url, options: { ...options, headers }, responseStatus: response.status, responseData: data });
+    } catch (err) {
+      // ignore logging errors
+    }
+  }
+
+  return data;
 }
