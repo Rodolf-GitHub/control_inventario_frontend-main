@@ -109,7 +109,7 @@ export default function ComprasPage() {
       setOpenCreateDialog(false);
       setProveedorId('');
       setFechaCompra('');
-      setSelectedTienda(null);
+      // No resetear selectedTienda ni selectedProveedor para mantener los filtros
     } catch (error) {
       toastError(error);
     }
