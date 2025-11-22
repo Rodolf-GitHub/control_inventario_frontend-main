@@ -11,6 +11,7 @@ import { listarTiendas, crearTienda, actualizarTienda, eliminarTienda } from '@/
 import { Tienda } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { toastSuccess, toastError } from '@/lib/toast-helper';
 
 export default function TiendasPage() {
@@ -55,12 +56,14 @@ export default function TiendasPage() {
       .catch((error) => toastError(error));
   };
 
-  const handleDelete = (id: number) => {
-    if (!confirm('¿Eliminar esta tienda?')) return;
-    eliminarTienda(id)
-      .then(() => mutate())
-      .then(() => toastSuccess({ title: 'Tienda eliminada' }))
-      .catch((error) => toastError(error));
+  const handleDelete = async (id: number) => {
+    try {
+      await eliminarTienda(id);
+      await mutate();
+      toastSuccess({ title: 'Tienda eliminada' });
+    } catch (error) {
+      toastError(error as any);
+    }
   };
 
   return (
@@ -127,15 +130,21 @@ export default function TiendasPage() {
                       <Button size="icon" variant="ghost" onClick={() => handleEdit(tienda)} title="Editar">
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        onClick={() => tienda.id && handleDelete(tienda.id)}
-                        className="text-destructive hover:bg-destructive/10"
-                        title="Eliminar"
+                      <ConfirmDialog
+                        title="Eliminar tienda"
+                        description={"¿Estás seguro que deseas eliminar esta tienda? Si la eliminas se eliminarán todos los proveedores, productos y compras asociadas a esta tienda."}
+                        confirmLabel="Eliminar tienda"
+                        onConfirm={() => tienda.id ? handleDelete(tienda.id) : undefined}
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="text-destructive hover:bg-destructive/10"
+                          title="Eliminar"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </ConfirmDialog>
                     </div>
                   </div>
                 )}

@@ -13,6 +13,7 @@ import { listarTiendas } from '@/lib/api/tiendas';
 import { listarProveedores, crearProveedor, actualizarProveedor, eliminarProveedor } from '@/lib/api/proveedores';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { toastSuccess, toastError } from '@/lib/toast-helper';
 
 export default function ProveedoresPage() {
@@ -65,12 +66,14 @@ export default function ProveedoresPage() {
       .catch((error) => toastError(error));
   };
 
-  const handleDelete = (id: number) => {
-    if (!confirm('¿Eliminar este proveedor?')) return;
-    eliminarProveedor(id)
-      .then(() => mutateProveedores())
-      .then(() => toastSuccess({ title: 'Proveedor eliminado' }))
-      .catch((error) => toastError(error));
+  const handleDelete = async (id: number) => {
+    try {
+      await eliminarProveedor(id);
+      await mutateProveedores();
+      toastSuccess({ title: 'Proveedor eliminado' });
+    } catch (error) {
+      toastError(error as any);
+    }
   };
 
   return (
@@ -165,15 +168,21 @@ export default function ProveedoresPage() {
                       <Button size="icon" variant="ghost" onClick={() => handleEdit(proveedor)} title="Editar">
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        onClick={() => proveedor.id && handleDelete(proveedor.id)}
-                        className="text-destructive hover:bg-destructive/10"
-                        title="Eliminar"
+                      <ConfirmDialog
+                        title="Eliminar proveedor"
+                        description={"¿Estás seguro que deseas eliminar este proveedor? Si lo eliminas se eliminarán sus productos y compras asociadas."}
+                        confirmLabel="Eliminar proveedor"
+                        onConfirm={() => proveedor.id ? handleDelete(proveedor.id) : undefined}
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="text-destructive hover:bg-destructive/10"
+                          title="Eliminar"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </ConfirmDialog>
                     </div>
                   </div>
                 )}

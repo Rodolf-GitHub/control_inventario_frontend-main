@@ -8,6 +8,7 @@ import { Nav } from '@/components/layout/nav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -138,7 +139,6 @@ export default function ComprasPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('¿Está seguro de eliminar esta compra?')) return;
     try {
       await eliminarCompra(id);
       mutate();
@@ -652,9 +652,16 @@ export default function ComprasPage() {
                   {colsCompras.map((c, idx) => (
                     <TableHead key={`compra-h-${c.id}`} className="bg-red-100 dark:bg-red-950/50 text-red-800 dark:text-red-200 w-[60px] sm:w-20 text-center text-[10px] sm:text-xs p-0.5 sm:p-1">
                       <div className="flex flex-col items-center gap-1">
-                        <Button size="icon" variant="ghost" className="h-6 w-6 p-0" onClick={() => c?.id && handleDelete(c.id)} title="Eliminar compra">
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+                        <ConfirmDialog
+                          title="Eliminar compra"
+                          description={"¿Estás seguro que deseas eliminar esta compra? Esta acción eliminará la compra de esta fecha ."}
+                          confirmLabel="Eliminar compra"
+                          onConfirm={() => c?.id ? handleDelete(c.id) : undefined}
+                        >
+                          <Button size="icon" variant="ghost" className="h-6 w-6 p-0" title="Eliminar compra">
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </ConfirmDialog>
                         <span className="text-[10px] sm:text-xs">{formatDate(c.fecha_compra)}</span>
                       </div>
                     </TableHead>

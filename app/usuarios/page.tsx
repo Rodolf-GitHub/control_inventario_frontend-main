@@ -14,6 +14,7 @@ import { Nav } from '@/components/layout/nav';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogHeader, DialogFooter } from '@/components/ui/dialog';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
 
 export default function UsuariosPage() {
   const { token, isAuthenticated, user, logout } = useAuth();
@@ -78,7 +79,6 @@ export default function UsuariosPage() {
   };
 
   const handleDeleteUser = async (usuarioId: number) => {
-    if (!confirm('¿Eliminar usuario? Esta acción no se puede deshacer.')) return;
     try {
       await eliminarUsuarioApi(usuarioId, token || undefined);
       toast({ title: 'Usuario eliminado' });
@@ -206,9 +206,16 @@ export default function UsuariosPage() {
                                   <Settings className="h-4 w-4 text-emerald-600" />
                                 </Button>
 
-                                <Button size="icon" variant="destructive" onClick={() => handleDeleteUser(u.id)} title={`Eliminar usuario ${u.username}`}>
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <ConfirmDialog
+                                  title="Eliminar usuario"
+                                  description={`¿Eliminar usuario ${u.username}? Esta acción no se puede deshacer.`}
+                                  confirmLabel="Eliminar usuario"
+                                  onConfirm={() => handleDeleteUser(u.id)}
+                                >
+                                  <Button size="icon" variant="destructive" title={`Eliminar usuario ${u.username}`}>
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </ConfirmDialog>
                               </div>
                             </td>
                           </tr>
@@ -236,9 +243,16 @@ export default function UsuariosPage() {
                           <Button size="icon" variant="ghost" onClick={() => router.push(`/usuarios/gestionar?id=${u.id}`)} title={`Gestionar permisos de ${u.username}`}>
                             <Settings className="h-4 w-4 text-emerald-600" />
                           </Button>
-                          <Button size="icon" variant="destructive" onClick={() => handleDeleteUser(u.id)} title={`Eliminar usuario ${u.username}`}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <ConfirmDialog
+                            title="Eliminar usuario"
+                            description={`¿Eliminar usuario ${u.username}? Esta acción no se puede deshacer.`}
+                            confirmLabel="Eliminar usuario"
+                            onConfirm={() => handleDeleteUser(u.id)}
+                          >
+                            <Button size="icon" variant="destructive" title={`Eliminar usuario ${u.username}`}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </ConfirmDialog>
                         </div>
                       </div>
                     ))}

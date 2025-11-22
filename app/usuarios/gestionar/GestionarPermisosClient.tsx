@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { getPermisosUsuarioApi, actualizarPermisoApi, eliminarPermisoApi, crearPermisoApi } from '@/lib/api/usuarios';
 import { listarTiendas } from '@/lib/api/tiendas';
 import { Button } from '@/components/ui/button';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Check, X, Plus, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -91,7 +92,6 @@ export default function GestionarPermisosClient({ usuarioId }: { usuarioId?: num
   }
 
   async function handleDelete(permisoId: number) {
-    if (!confirm('Eliminar permiso?')) return;
     try {
       await eliminarPermisoApi(permisoId, token || undefined);
       toast({ title: 'Permiso eliminado' });
@@ -174,9 +174,16 @@ export default function GestionarPermisosClient({ usuarioId }: { usuarioId?: num
                         </td>
                         <td className="p-2">
                           <div className="flex gap-2 items-center">
-                            <Button size="icon" variant="destructive" onClick={() => handleDelete(p.id)} title="Eliminar permiso">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <ConfirmDialog
+                              title="Eliminar permiso"
+                              description={"¿Eliminar permiso?"}
+                              confirmLabel="Eliminar permiso"
+                              onConfirm={() => handleDelete(p.id)}
+                            >
+                              <Button size="icon" variant="destructive" title="Eliminar permiso">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </ConfirmDialog>
                           </div>
                         </td>
                       </tr>
@@ -194,9 +201,16 @@ export default function GestionarPermisosClient({ usuarioId }: { usuarioId?: num
                         <div className="font-medium">{(tiendas && tiendas.find(t => t.id === p.tienda)?.nombre) || p.tienda}</div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button size="icon" variant="destructive" onClick={() => handleDelete(p.id)} title="Eliminar permiso">
-                          <X className="h-4 w-4" />
-                        </Button>
+                        <ConfirmDialog
+                          title="Eliminar permiso"
+                          description={"¿Eliminar permiso?"}
+                          confirmLabel="Eliminar permiso"
+                          onConfirm={() => handleDelete(p.id)}
+                        >
+                          <Button size="icon" variant="destructive" title="Eliminar permiso">
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </ConfirmDialog>
                       </div>
                     </div>
                     <div className="mt-3 grid grid-cols-2 gap-2">

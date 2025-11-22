@@ -13,6 +13,7 @@ import { listarTiendas } from '@/lib/api/tiendas';
 import { listarProveedores } from '@/lib/api/proveedores';
 import { listarProductos, crearProducto, actualizarProducto, eliminarProducto, moverProducto } from '@/lib/api/productos';
 import { Toaster } from '@/components/ui/toaster';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { toastSuccess, toastError } from '@/lib/toast-helper';
 
 export default function ProductosPage() {
@@ -81,12 +82,14 @@ export default function ProductosPage() {
       .catch((error) => toastError(error));
   };
 
-  const handleDelete = (id: number) => {
-    if (!confirm('¿Eliminar este producto?')) return;
-    eliminarProducto(id)
-      .then(() => mutateProductos())
-      .then(() => toastSuccess({ title: 'Producto eliminado' }))
-      .catch((error) => toastError(error));
+  const handleDelete = async (id: number) => {
+    try {
+      await eliminarProducto(id);
+      await mutateProductos();
+      toastSuccess({ title: 'Producto eliminado' });
+    } catch (error) {
+      toastError(error as any);
+    }
   };
 
   const moveItem = async (index: number, direction: 'up' | 'down') => {
@@ -219,15 +222,21 @@ export default function ProductosPage() {
                       <Button size="icon" variant="ghost" onClick={() => handleEdit(producto)} title="Editar">
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        onClick={() => producto.id && handleDelete(producto.id)}
-                        className="text-destructive hover:bg-destructive/10"
-                        title="Eliminar"
+                      <ConfirmDialog
+                        title="Eliminar producto"
+                        description={"¿Estás seguro que deseas eliminar este producto? Este producto se eliminará de las compras en las que esté asociado."}
+                        confirmLabel="Eliminar producto"
+                        onConfirm={() => producto.id ? handleDelete(producto.id) : undefined}
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="text-destructive hover:bg-destructive/10"
+                          title="Eliminar"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </ConfirmDialog>
                       <Button size="icon" variant="ghost" onClick={() => moveItem(idx, 'up')} title="Subir">
                         <ArrowUp className="h-4 w-4" />
                       </Button>
