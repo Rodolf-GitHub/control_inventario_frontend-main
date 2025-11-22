@@ -168,8 +168,11 @@ export default function ComprasPage() {
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
-    const date = new Date(dateString);
-    return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
+    // Extract date portion directly from backend string to avoid timezone shifts
+    // Supports formats like "2024-11-08" or "2024-11-08T00:00:00"
+    const datePart = dateString.split('T')[0]; // Get "2024-11-08"
+    const [year, month, day] = datePart.split('-');
+    return `${day}/${month}`;
   };
 
   // Build inventory table from compras (use up to 3 latest compras)

@@ -26,6 +26,7 @@ export interface Producto {
   id?: number;
   nombre: string;
   proveedor: number;
+  orden?: number;
 }
 
 export interface ProductoIn {

@@ -34,7 +34,7 @@ export async function comprasPorRango(
   limit: number = 3,
   tiendaId?: number,
   proveedorId?: number,
-  order: string = 'asc'
+  order: string = 'desc'
 ): Promise<Compra[]> {
   const params = new URLSearchParams();
   if (fechaInicio) params.append('fecha_inicio', fechaInicio);
