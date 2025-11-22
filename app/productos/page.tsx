@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
-import { Plus, Pencil, Trash2, Package, Check, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, Package, Check, X, ArrowUp, ArrowDown } from 'lucide-react';
 import { Nav } from '@/components/layout/nav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,8 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Producto, Tienda, Proveedor } from '@/lib/types';
 import { listarTiendas } from '@/lib/api/tiendas';
 import { listarProveedores } from '@/lib/api/proveedores';
-import { listarProductos, crearProducto, actualizarProducto, eliminarProducto } from '@/lib/api/productos';
-import { useToast } from '@/hooks/use-toast';
+import { listarProductos, crearProducto, actualizarProducto, eliminarProducto, moverProducto } from '@/lib/api/productos';
 import { Toaster } from '@/components/ui/toaster';
 import { toastSuccess, toastError } from '@/lib/toast-helper';
 
@@ -46,10 +45,12 @@ export default function ProductosPage() {
   const [editingNombre, setEditingNombre] = useState('');
   const [creatingNew, setCreatingNew] = useState(false);
   const [newNombre, setNewNombre] = useState('');
-  const { toast } = useToast();
+  
 
   const filteredProveedores = proveedores || [];
   const filteredProductos = productos || [];
+
+  const displayedProductos = filteredProductos;
 
   const handleEdit = (producto: Producto) => {
     setEditingId(producto.id!);
@@ -88,15 +89,29 @@ export default function ProductosPage() {
       .catch((error) => toastError(error));
   };
 
+  const moveItem = async (index: number, direction: 'up' | 'down') => {
+    const producto = displayedProductos[index];
+    if (!producto || !producto.id) return;
+    try {
+      await moverProducto(producto.id, direction === 'up' ? 'arriba' : 'abajo');
+      await mutateProductos();
+      toastSuccess({ title: 'Producto movido' });
+    } catch (err) {
+      toastError(err as any);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Nav />
       <main className="mx-auto max-w-7xl px-4 py-4 sm:py-8 sm:px-6 lg:px-8">
-        <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between">
           <h1 className="text-xl sm:text-2xl font-semibold">Productos</h1>
-          <Button size="sm" onClick={() => setCreatingNew(true)} disabled={!selectedProveedor} title="Nuevo Producto">
-            <Plus className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button size="sm" onClick={() => setCreatingNew(true)} disabled={!selectedProveedor} title="Nuevo Producto">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         <Card className="mb-3 bg-blue-50">
@@ -170,7 +185,7 @@ export default function ProductosPage() {
         )}
 
         <div className="space-y-2">
-          {filteredProductos.map((producto) => (
+          {displayedProductos.map((producto, idx) => (
             <Card key={producto.id}>
               <CardContent className="pt-4">
                 {editingId === producto.id ? (
@@ -200,7 +215,7 @@ export default function ProductosPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 items-center">
                       <Button size="icon" variant="ghost" onClick={() => handleEdit(producto)} title="Editar">
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -212,6 +227,12 @@ export default function ProductosPage() {
                         title="Eliminar"
                       >
                         <Trash2 className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon" variant="ghost" onClick={() => moveItem(idx, 'up')} title="Subir">
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon" variant="ghost" onClick={() => moveItem(idx, 'down')} title="Bajar">
+                        <ArrowDown className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>

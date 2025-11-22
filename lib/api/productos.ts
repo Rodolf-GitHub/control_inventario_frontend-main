@@ -24,3 +24,10 @@ export async function eliminarProducto(id: number): Promise<void> {
     method: 'DELETE',
   });
 }
+
+export async function moverProducto(productoId: number, direccion: 'arriba' | 'abajo') {
+  return apiRequest('/api/producto/mover/', {
+    method: 'POST',
+    body: JSON.stringify({ producto_id: productoId, direccion }),
+  });
+}
