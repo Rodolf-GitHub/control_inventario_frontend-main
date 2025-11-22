@@ -191,9 +191,9 @@ export default function ComprasPage() {
 
     cols.forEach((compra, colIdx) => {
       compra.detalles.forEach((detalle) => {
-        // Support both `producto` and `producto_id` coming from backend
-        const pid = detalle.producto ?? detalle.producto_id ?? detalle.productoId ?? null;
-        const productName = detalle.producto_nombre ?? detalle.producto_nombre ?? `Producto ${pid ?? 'unk'}`;
+        // Get producto ID from detalle
+        const pid = detalle.producto ?? null;
+        const productName = detalle.producto_nombre ?? `Producto ${pid ?? 'unk'}`;
 
         // ensure a unique key for the map entry
         const key = pid ?? `${productName}-${detalle.id}`;
