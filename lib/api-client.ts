@@ -1,4 +1,5 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { toast as showToast } from '@/hooks/use-toast';
 
 export async function apiRequest<T>(
   endpoint: string,
@@ -25,13 +26,17 @@ export async function apiRequest<T>(
   });
 
   if (!response.ok) {
-    // If unauthorized, clear token and redirect to login
+    // If unauthorized, clear token and show a toast asking user to login again
     if (response.status === 401) {
       try {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('token');
-          // navigate to login page to force re-auth
-          window.location.href = '/login';
+          try {
+            showToast({ title: 'Sesión inválida', description: 'Token inválido. Por favor, inicia sesión de nuevo.', variant: 'destructive' });
+          } catch (e) {
+            // If toast system isn't available, fall back to a simple alert
+            try { window.alert('Sesión inválida. Por favor, inicia sesión de nuevo.'); } catch {}
+          }
         }
       } catch {
         // ignore
