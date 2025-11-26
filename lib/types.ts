@@ -43,6 +43,10 @@ export interface DetalleCompra {
   id?: number;
   compra: number;
   producto: number;
+  // Some backends return alternate field names; accept them to keep TS happy
+  producto_id?: number;
+  productoId?: number;
+  compra_id?: number;
   cantidad: number;
   inventario_anterior: number;
 }

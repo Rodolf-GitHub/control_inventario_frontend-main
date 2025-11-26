@@ -191,12 +191,12 @@ export default function ComprasPage() {
 
     cols.forEach((compra, colIdx) => {
       compra.detalles.forEach((detalle) => {
-        // Get producto ID from detalle
-        const pid = detalle.producto ?? null;
+        // Get producto ID from detalle (support multiple possible field names)
+        const pid = detalle.producto ?? detalle.producto_id ?? detalle.productoId ?? null;
         const productName = detalle.producto_nombre ?? `Producto ${pid ?? 'unk'}`;
 
-        // ensure a unique key for the map entry
-        const key = pid ?? `${productName}-${detalle.id}`;
+        // ensure a stable key for the map entry (prefer numeric product id, fallback to product name)
+        const key = pid ?? productName;
         if (!map.has(key)) {
           map.set(key, {
             id: pid ?? key,
