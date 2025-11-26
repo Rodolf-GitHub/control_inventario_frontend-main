@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import packageJson from '../../package.json';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const version = packageJson?.version ?? '';
   const router = useRouter();
   const { login } = useAuth();
   const { toast } = useToast();
@@ -39,6 +41,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <div className="fixed top-4 right-4 z-50 pointer-events-none">
+        <div className="text-xs text-muted-foreground bg-muted/10 px-2 py-1 rounded-md">{version ? `v${version}` : 'v...'}</div>
+      </div>
       <Card className="w-full max-w-md">
         <CardContent className="flex flex-col items-center gap-4 py-8">
           <div className="flex flex-col items-center gap-2">
