@@ -32,10 +32,10 @@ export async function apiRequest<T>(
         if (typeof window !== 'undefined') {
           localStorage.removeItem('token');
           try {
-            showToast({ title: 'Sesión inválida', description: 'Token inválido. Por favor, inicia sesión de nuevo.', variant: 'destructive' });
+            // Redirect user to login page when token is invalid
+            window.location.href = '/login';
           } catch (e) {
-            // If toast system isn't available, fall back to a simple alert
-            try { window.alert('Sesión inválida. Por favor, inicia sesión de nuevo.'); } catch {}
+            try { window.location.assign('/login'); } catch {}
           }
         }
       } catch {
