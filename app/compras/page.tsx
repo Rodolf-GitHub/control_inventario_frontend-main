@@ -719,13 +719,8 @@ export default function ComprasPage() {
                       const anteriorField = `col${idx + 1}Anterior`;
                       const editingField = editingCell?.field === compraField && editingCell?.id === item.id;
 
-                      // compute suggestion values once so we can show them both in edit and read modes
                       const compraVal = item[compraField] ?? 0;
                       const compraDisplay = compraVal === 0 ? '-' : String(compraVal);
-                      const currInv = item[`col${idx + 1}Inv`];
-                      const prevInv = idx > 0 ? item[`col${idx}Inv`] : undefined;
-                      const showSuggestion = typeof prevInv === 'number' && typeof currInv === 'number' && prevInv > currInv;
-                      const suggestion = showSuggestion ? (prevInv - currInv) : null;
 
                       return (
                         <TableCell
@@ -745,11 +740,6 @@ export default function ComprasPage() {
                                   className="w-[45px] sm:w-12 h-5 sm:h-6 text-[10px] sm:text-xs mx-auto text-center p-0"
                                   autoFocus
                                 />
-                                {showSuggestion ? (
-                                  <span className="no-print-suggestion text-[8px] text-green-600 dark:text-green-400">{suggestion}</span>
-                                ) : (
-                                  <span className="text-[7px] sm:text-[8px] text-muted-foreground">&nbsp;</span>
-                                )}
                               </>
                             ) : (
                               <>
@@ -758,11 +748,6 @@ export default function ComprasPage() {
                                 >
                                   {compraDisplay}
                                 </span>
-                                {showSuggestion ? (
-                                  <span className="no-print-suggestion text-[8px] text-green-600 dark:text-green-400">{suggestion}</span>
-                                ) : (
-                                  <span className="text-[7px] sm:text-[8px] text-muted-foreground">&nbsp;</span>
-                                )}
                               </>
                             )}
                           </div>
