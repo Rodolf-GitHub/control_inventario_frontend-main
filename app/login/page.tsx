@@ -132,7 +132,6 @@ export default function LoginPage() {
               </Button>
             </div>
           </div>
-          )}
         </CardContent>
       </Card>
       <p className="mt-4 text-xs text-muted-foreground">
