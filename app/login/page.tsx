@@ -10,7 +10,7 @@ import { loginApi } from '@/lib/api/usuarios';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth';
 import { Toaster } from '@/components/ui/toaster';
-import { Store, Download } from 'lucide-react';
+import { Store, Download, Share2 } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -44,6 +44,27 @@ export default function LoginPage() {
     await deferredPrompt.current.userChoice;
     deferredPrompt.current = null;
     setInstallAvailable(false);
+  };
+
+  const handleShare = async () => {
+    const url = window.location.origin;
+    const title = 'Control de Inventario';
+    const text = 'Accede al sistema de control de inventario y compras.';
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      toast({ title: 'Enlace copiado', description: 'El enlace se copió al portapapeles.' });
+    } catch {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast({ title: 'Enlace copiado', description: 'El enlace se copió al portapapeles.' });
+      } catch {
+        toast({ title: 'Error', description: 'No se pudo compartir ni copiar el enlace.', variant: 'destructive' });
+      }
+    }
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -87,17 +108,30 @@ export default function LoginPage() {
             </div>
           </form>
 
-          {installAvailable && (
-            <div className="w-full rounded-lg border bg-blue-50 dark:bg-blue-950/30 p-4 flex items-center justify-between gap-3 mt-2">
-              <div className="flex flex-col gap-0.5">
-                <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">Instala la app</p>
-                <p className="text-xs text-blue-600 dark:text-blue-400">Mejor experiencia desde la aplicación.</p>
+          <div className="w-full flex flex-col gap-2 mt-2">
+            {installAvailable && (
+              <div className="w-full rounded-lg border bg-blue-50 dark:bg-blue-950/30 p-4 flex items-center justify-between gap-3">
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">Instala la app</p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400">Mejor experiencia desde la aplicación.</p>
+                </div>
+                <Button size="sm" variant="outline" className="shrink-0 border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-300 dark:hover:bg-blue-900" onClick={handleInstall}>
+                  <Download className="h-4 w-4 mr-1" />
+                  Instalar
+                </Button>
               </div>
-              <Button size="sm" variant="outline" className="shrink-0 border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-300 dark:hover:bg-blue-900" onClick={handleInstall}>
-                <Download className="h-4 w-4 mr-1" />
-                Instalar
+            )}
+            <div className="w-full rounded-lg border bg-green-50 dark:bg-green-950/30 p-4 flex items-center justify-between gap-3">
+              <div className="flex flex-col gap-0.5">
+                <p className="text-sm font-semibold text-green-800 dark:text-green-200">Compartir</p>
+                <p className="text-xs text-green-600 dark:text-green-400">Comparte el acceso al sistema.</p>
+              </div>
+              <Button size="sm" variant="outline" className="shrink-0 border-green-300 text-green-700 hover:bg-green-100 dark:border-green-700 dark:text-green-300 dark:hover:bg-green-900" onClick={handleShare}>
+                <Share2 className="h-4 w-4 mr-1" />
+                Compartir
               </Button>
             </div>
+          </div>
           )}
         </CardContent>
       </Card>
