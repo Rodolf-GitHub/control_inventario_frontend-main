@@ -135,6 +135,12 @@ export default function LoginPage() {
           )}
         </CardContent>
       </Card>
+      <p className="mt-4 text-xs text-muted-foreground">
+        Powered by{' '}
+        <a href="https://groerosoftware.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">
+          groerosoftware.com
+        </a>
+      </p>
       <Toaster />
     </div>
   );
